@@ -139,6 +139,7 @@ public class TypeAliasRegistry {
   }
 
   public void registerAlias(Class<?> type) {
+    // 会使用 Bean的首字母小写的非限定类名来作为它的别名。 比如 domain.blog.Author 的别名为author,但是如果有@Alias注解，会使用注解值
     String alias = type.getSimpleName();
     Alias aliasAnnotation = type.getAnnotation(Alias.class);
     if (aliasAnnotation != null) {
