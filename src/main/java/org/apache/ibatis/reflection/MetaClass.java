@@ -28,6 +28,7 @@ import org.apache.ibatis.reflection.property.PropertyTokenizer;
 
 /**
  * @author Clinton Begin
+ * MetaClass是一个保存对象定义比如getter/setter/构造器等的元数据类
  */
 public class MetaClass {
 
