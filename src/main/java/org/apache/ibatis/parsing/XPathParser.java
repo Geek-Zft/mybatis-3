@@ -116,6 +116,13 @@ public class XPathParser {
     this.document = createDocument(new InputSource(new StringReader(xml)));
   }
 
+  /**
+   *
+   * @param reader Reader
+   * @param validation 是否进行DTD校验
+   * @param variables 属性配置
+   * @param entityResolver  XML实体节点解析器
+   */
   public XPathParser(Reader reader, boolean validation, Properties variables, EntityResolver entityResolver) {
     commonConstructor(validation, variables, entityResolver);
     this.document = createDocument(new InputSource(reader));
@@ -226,6 +233,11 @@ public class XPathParser {
     }
   }
 
+  /**
+   * 根据mybatis自身需要创建一个文档解析器，然后调用parse将输入input source解析为DOM XML文档并返回
+   * @param inputSource
+   * @return
+   */
   private Document createDocument(InputSource inputSource) {
     // important: this must only be called AFTER common constructor
     try {
@@ -235,9 +247,11 @@ public class XPathParser {
       factory.setNamespaceAware(false);
       factory.setIgnoringComments(true);
       factory.setIgnoringElementContentWhitespace(false);
+      //设置是否将CDATA节点转换为Text节点
       factory.setCoalescing(false);
+      //设置是否展开实体引用节点，这里应该是sql片段引用的关键
       factory.setExpandEntityReferences(true);
-
+      //设置解析mybatis xml文档节点的解析器,也就是上面的XMLMapperEntityResolver
       DocumentBuilder builder = factory.newDocumentBuilder();
       builder.setEntityResolver(entityResolver);
       builder.setErrorHandler(new ErrorHandler() {

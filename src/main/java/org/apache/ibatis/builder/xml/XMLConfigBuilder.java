@@ -66,6 +66,8 @@ public class XMLConfigBuilder extends BaseBuilder {
   }
 
   public XMLConfigBuilder(Reader reader, String environment, Properties props) {
+    //对于XML文件本身技术上的加载和解析都委托给了XPathParser,最终用的是jdk自带的xml解析器而非第三方比如dom4j，底层使用了xpath方式进行节点解析
+    //XPath 是一门在 XML 文档中查找信息的语言
     this(new XPathParser(reader, true, props, new XMLMapperEntityResolver()), environment, props);
   }
 
@@ -82,7 +84,7 @@ public class XMLConfigBuilder extends BaseBuilder {
   }
 
   private XMLConfigBuilder(XPathParser parser, String environment, Properties props) {
-    super(new Configuration());
+    super(new Configuration()); //调用父类构造方法
     ErrorContext.instance().resource("SQL Mapper Configuration");
     this.configuration.setVariables(props);
     this.parsed = false;
@@ -91,14 +93,22 @@ public class XMLConfigBuilder extends BaseBuilder {
   }
 
   public Configuration parse() {
+    //首先判断有没有解析过配置文件，只有没有解析过才允许解析
     if (parsed) {
       throw new BuilderException("Each XMLConfigBuilder can only be used once.");
     }
     parsed = true;
+    //mybatis配置文件解析的主流程
+    //调用了parser.evalNode(“/configuration”)返回根节点的org.apache.ibatis.parsing.XNode表示
     parseConfiguration(parser.evalNode("/configuration"));
     return configuration;
   }
 
+  /**
+   * 所有的root.evalNode底层都是调用XML DOM的evaluate()方法，
+   * 根据给定的节点表达式来计算指定的 XPath 表达式，并且返回一个XPathResult对象，返回类型在Node.evalNode()方法中均被指定为NODE。
+   * @param root
+   */
   private void parseConfiguration(XNode root) {
     try {
       //issue #117 read properties first

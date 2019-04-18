@@ -30,6 +30,7 @@ import org.apache.ibatis.type.TypeHandlerRegistry;
 
 /**
  * @author Clinton Begin
+ * 两个关键的子类  XMLConfigBuilder  XMLMapperBuilder
  */
 public abstract class BaseBuilder {
   protected final Configuration configuration;
@@ -37,8 +38,11 @@ public abstract class BaseBuilder {
   protected final TypeHandlerRegistry typeHandlerRegistry;
 
   public BaseBuilder(Configuration configuration) {
+    //初始化了Configuration对象
     this.configuration = configuration;
+    //设置类型别名注册器
     this.typeAliasRegistry = this.configuration.getTypeAliasRegistry();
+    //设置类型处理器注册器
     this.typeHandlerRegistry = this.configuration.getTypeHandlerRegistry();
   }
 
