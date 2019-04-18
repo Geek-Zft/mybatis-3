@@ -228,23 +228,37 @@ public class XMLConfigBuilder extends BaseBuilder {
     }
   }
 
+  /**
+   *  eg: <properties resource="org/mybatis/internal/example/config.properties">
+   *           <property name="username" value="dev_user"/>
+   *           <property name="password" value="F2Fa3!33TYyg"/>
+   *       </properties>
+   *
+   * @param context
+   * @throws Exception
+   */
   private void propertiesElement(XNode context) throws Exception {
     if (context != null) {
+      // 加载property节点为property
       Properties defaults = context.getChildrenAsProperties();
       String resource = context.getStringAttribute("resource");
       String url = context.getStringAttribute("url");
+      // 必须至少包含resource或者url属性之一
       if (resource != null && url != null) {
         throw new BuilderException("The properties element cannot specify both a URL and a resource based property file reference.  Please specify one or the other.");
       }
+      // 从url或resource加载配置文件
       if (resource != null) {
         defaults.putAll(Resources.getResourceAsProperties(resource));
       } else if (url != null) {
         defaults.putAll(Resources.getUrlAsProperties(url));
       }
+      // 和configuration.variables合并
       Properties vars = configuration.getVariables();
       if (vars != null) {
         defaults.putAll(vars);
       }
+      // 赋值到XMLConfigBuilder.parser和BaseBuilder.configuration
       parser.setVariables(defaults);
       configuration.setVariables(defaults);
     }
