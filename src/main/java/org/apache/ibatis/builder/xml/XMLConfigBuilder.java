@@ -140,7 +140,7 @@ public class XMLConfigBuilder extends BaseBuilder {
     Properties props = context.getChildrenAsProperties();
     // Check that all settings are known to the configuration class
     // 检查所有从settings加载的设置,确保它们都在Configuration定义的范围内
-    // MetaClass是一个保存对象定义比如getter/setter/构造器等的元数据类,localReflectorFactory则是mybatis提供的默认反射工厂实现
+    // MetaClass是一个保存对象定义比如getter/setter/构造器等的元数据类,localReflectorFactory则是mybatis提供的默认反射工厂实现,这个ReflectorFactory主要采用了工厂类，其内部使用的Reflector采用了facade设计模式，简化反射的使用
     MetaClass metaConfig = MetaClass.forClass(Configuration.class, localReflectorFactory);
     for (Object key : props.keySet()) {
       if (!metaConfig.hasSetter(String.valueOf(key))) {
@@ -150,6 +150,13 @@ public class XMLConfigBuilder extends BaseBuilder {
     return props;
   }
 
+  /**
+   * 加载自定义VFS
+   * VFS主要用来加载容器内的各种资源，比如jar或者class文件。mybatis提供了2个实现 JBoss6VFS 和 DefaultVFS，并提供了用户扩展点，
+   * 用于自定义VFS实现，加载顺序是自定义VFS实现 > 默认VFS实现 取第一个加载成功的，默认情况下会先加载JBoss6VFS，如果classpath下找不到jboss的vfs实现才会加载默认VFS实现
+   * @param props
+   * @throws ClassNotFoundException
+   */
   private void loadCustomVfs(Properties props) throws ClassNotFoundException {
     String value = props.getProperty("vfsImpl");
     if (value != null) {
